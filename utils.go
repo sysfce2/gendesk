@@ -5,13 +5,6 @@ import (
 	"strings"
 )
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 // Capitalize a string or return the same if it is too short
 func capitalize(s string) string {
 	lenS := len(s)
