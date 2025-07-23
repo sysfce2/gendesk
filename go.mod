@@ -9,7 +9,7 @@ require (
 	github.com/xyproto/env/v2 v2.5.3
 	github.com/xyproto/textoutput v1.17.2
 	github.com/yhat/scrape v0.0.0-20161128144610-24b7890b0945
-	golang.org/x/net v0.40.0
+	golang.org/x/net v0.42.0
 )
 
 require (
@@ -20,6 +20,6 @@ require (
 	github.com/pkg/term v1.2.0-beta.2.0.20210419004637-f749b98bd0ba // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
 	github.com/xyproto/burnfont v1.2.3 // indirect
-	github.com/xyproto/vt100 v1.16.12 // indirect
-	golang.org/x/sys v0.33.0 // indirect
+	github.com/xyproto/vt100 v1.20.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
 )
