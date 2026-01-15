@@ -14,7 +14,9 @@ Pull requests are welcome.
 
 * Silence a warning for valid additional categories, ref issue #31.
 * Update dependencies.
+* Require Go 1.24 or later.
 * Update documentation.
+* Update CI configuration.
 
 ## Changes from 1.0.9 to 1.0.10
 
