@@ -10,6 +10,12 @@ Pull requests are welcome.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/gendesk.svg)](https://repology.org/project/gendesk/versions)
 
+## Changes from 1.0.10 to 1.0.11
+
+* Silence a warning for valid additional categories, ref issue #31.
+* Update dependencies.
+* Update documentation.
+
 ## Changes from 1.0.9 to 1.0.10
 
 * Update documentation.
@@ -217,6 +223,6 @@ Pull requests are welcome.
 
 ## General information
 
-* Version: 1.0.10
+* Version: 1.0.11
 * Author: Alexander F. Rødseth &lt;xyproto@archlinux.org&gt;
 * License: BSD-3
