@@ -237,9 +237,11 @@ Note:
       an icon will be downloaded from either the location specified in the
       configuration or from: ` + firstpart + `
       (This may or may not result in the icon you wished for).
-    * Categories are guessed based on keywords in the
-      package description, unless provided.
+    * Categories are guessed from keywords in the package description,
+      unless specified.
     * Icons are assumed to be found in "/usr/share/pixmaps/" once installed.
+    * Adding translations for many languages is not supported by gendesk,
+      but it is possible to first generate a file, and then add translations.
 `)
 }
 
