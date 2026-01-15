@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/xyproto/env/v2"
-	"github.com/xyproto/textoutput"
+	"github.com/xyproto/vt"
 )
 
 // Return a list of pkgnames for split packages
@@ -58,7 +58,7 @@ func resolve(vars map[string]string, s *string) {
 	}
 }
 
-func parsePKGBUILD(o *textoutput.TextOutput, filename string, iconurl, pkgname *string, pkgnames *[]string, pkgdescMap, execMap, nameMap, genericNameMap, mimeTypesMap, commentMap, categoriesMap, customMap *map[string]string) {
+func parsePKGBUILD(o *vt.TextOutput, filename string, iconurl, pkgname *string, pkgnames *[]string, pkgdescMap, execMap, nameMap, genericNameMap, mimeTypesMap, commentMap, categoriesMap, customMap *map[string]string) {
 	// Fill in the dictionaries using a PKGBUILD
 	filedata, err := os.ReadFile(filename)
 	if err != nil {

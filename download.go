@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/unknwon/goconfig"
-	"github.com/xyproto/textoutput"
+	"github.com/xyproto/vt"
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 )
@@ -30,7 +30,7 @@ var (
 // MustDownloadFile takes an URL to a filename and attempts to download it to the given filename
 // If force is true, any existing file may be overwritten.
 // May exit the program if there are fundamental problems.
-func MustDownloadFile(url, filename string, o *textoutput.TextOutput, force bool) {
+func MustDownloadFile(url, filename string, o *vt.TextOutput, force bool) {
 	var client http.Client
 	resp, err := client.Get(url)
 	if err != nil {
@@ -65,7 +65,7 @@ func userexpand(path string) string {
 // GetIconSearchURL reads configuration from ~/.gendeskrc, ~/.config/gendesk or /etc/gendeskrc
 // in order to retrieve an URL containing "%s" that can be used for searching for icons by name.
 // May exit the program if there are fundamental problems.
-func GetIconSearchURL(o *textoutput.TextOutput) string {
+func GetIconSearchURL(o *vt.TextOutput) string {
 	// Read the configuration file from various locations,
 	cfilename := "~/.config/gendesk"
 	cfile, err := goconfig.LoadConfigFile(userexpand(cfilename))
@@ -85,17 +85,17 @@ func GetIconSearchURL(o *textoutput.TextOutput) string {
 	iconURL, err := cfile.GetValue("default", "icon_url")
 	if err != nil {
 		o.Err("error!\n")
-		o.Fprintln(os.Stderr, o.DarkRed(cfilename+" does not contain icon_url under under a [default] section. Example:"))
-		o.Fprintln(os.Stderr, o.LightGreen("[default]"))
-		o.Fprintln(os.Stderr, o.LightGreen("icon_url = http://example.iconrepository.com/q=%s.png\n"))
+		o.Eprintln(vt.Red.Get(cfilename + " does not contain icon_url under under a [default] section. Example:"))
+		o.Eprintln(vt.LightGreen.Get("[default]"))
+		o.Eprintln(vt.LightGreen.Get("icon_url = http://example.iconrepository.com/q=%s.png\n"))
 		os.Exit(1)
 	}
 
 	if !strings.Contains(iconURL, "%s") {
 		o.Err("error!\n")
-		o.Fprintln(os.Stderr, o.DarkRed(cfilename+" does not contain an icon search url containing %s under a [default] section. Example:"))
-		o.Fprintln(os.Stderr, o.LightGreen("[default]"))
-		o.Fprintln(os.Stderr, o.LightGreen("icon_url = http://example.iconrepository.com/q=%s.png\n"))
+		o.Eprintln(vt.Red.Get(cfilename + " does not contain an icon search url containing %s under a [default] section. Example:"))
+		o.Eprintln(vt.LightGreen.Get("[default]"))
+		o.Eprintln(vt.LightGreen.Get("icon_url = http://example.iconrepository.com/q=%s.png\n"))
 		os.Exit(1)
 	}
 
@@ -147,7 +147,7 @@ func findIconURL(searchURL, keyword string, nmatch int) (URL string) {
 // URL given in the configuration file, or from iconarchive.com.
 // Only supports downloading png icons.
 // May exit the program if there are fundamental problems.
-func WriteIconFile(name string, o *textoutput.TextOutput, force bool) error {
+func WriteIconFile(name string, o *vt.TextOutput, force bool) error {
 	var (
 		downloadURL   string
 		client        http.Client
