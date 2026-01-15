@@ -105,6 +105,9 @@ var (
 	}
 )
 
+// from https://specifications.freedesktop.org/menu/1.1/additional-category-registry.html
+var additionalCategories = []string{"2DGraphics", "3DGraphics", "Accessibility", "ActionGame", "Adult", "AdventureGame", "Amusement", "ArcadeGame", "Archiving", "Art", "ArtificialIntelligence", "Astronomy", "AudioVideoEditing", "Biology", "BlocksGame", "BoardGame", "Building", "Calculator", "Calendar", "CardGame", "Chart", "Chat", "Chemistry", "Clock", "Compression", "ComputerScience", "ConsoleOnly", "Construction", "ContactManagement", "Core", "Database", "DataVisualization", "Debugger", "DesktopSettings", "Dialup", "Dictionary", "DiscBurning", "Documentation", "Economy", "Electricity", "Electronics", "Email", "Emulator", "Engineering", "Feed", "FileManager", "Filesystem", "FileTools", "FileTransfer", "Finance", "FlowChart", "Geography", "Geology", "Geoscience", "GNOME", "GTK", "GUIDesigner", "HamRadio", "HardwareSettings", "History", "Humanities", "IDE", "ImageProcessing", "InstantMessaging", "IRCClient", "Java", "KDE", "KidsGame", "Languages", "Literature", "LogicGame", "Maps", "Math", "MedicalSoftware", "Midi", "Mixer", "Monitor", "Motif", "Music", "News", "NumericalAnalysis", "OCR", "P2P", "PackageManager", "ParallelComputing", "PDA", "Photography", "Physics", "Player", "Presentation", "Printing", "Profiling", "ProjectManagement", "Publishing", "Qt", "RasterGraphics", "Recorder", "RemoteAccess", "RevisionControl", "Robotics", "RolePlaying", "Scanning", "Security", "Sequencer", "Shooter", "Simulation", "Spirituality", "Sports", "SportsGame", "Spreadsheet", "StrategyGame", "Telephony", "TelephonyTools", "TerminalEmulator", "TextEditor", "TextTools", "Translation", "Tuner", "TV", "VectorGraphics", "VideoConference", "Viewer", "WebBrowser", "WebDevelopment", "WordProcessor", "XFCE"}
+
 // ValidCategoryWords validates each word in 'categoryWords' against a list of accepted categories derived from 'categorymap'.
 // It ensures all provided words represent valid application categories, returning an error for any unrecognized category.
 func ValidCategoryWords(categoryWords []string) error {
@@ -121,7 +124,7 @@ func ValidCategoryWords(categoryWords []string) error {
 		}
 	}
 	for _, word := range categoryWords {
-		if !hasS(validWords, word) {
+		if !hasS(validWords, word) && !hasS(additionalCategories, word) {
 			return errors.New(word + " is an unrecognized category")
 		}
 	}
