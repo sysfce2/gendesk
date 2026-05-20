@@ -2,19 +2,21 @@ package main
 
 import (
 	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
-// Capitalize a string or return the same if it is too short
+// Capitalize uppercases the first rune of s and leaves the rest unchanged.
+// Operates on runes rather than bytes so multi-byte UTF-8 input is preserved.
 func capitalize(s string) string {
-	lenS := len(s)
-	switch {
-	case lenS >= 2:
-		return strings.ToTitle(s[0:1]) + s[1:]
-	case lenS == 1:
-		return strings.ToUpper(string(s[0]))
-	default:
+	if s == "" {
 		return s
 	}
+	r, size := utf8.DecodeRuneInString(s)
+	if r == utf8.RuneError {
+		return s
+	}
+	return string(unicode.ToTitle(r)) + s[size:]
 }
 
 // Return what's between two strings, "a" and "b", in another string
