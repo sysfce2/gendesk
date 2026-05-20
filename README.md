@@ -10,11 +10,14 @@ Pull requests are welcome.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/gendesk.svg)](https://repology.org/project/gendesk/versions)
 
-## Changes from 1.0.11 to 1.0.12
+## Changes from 1.0.12 to 1.0.13
 
 * Add an `-o`/`--output` flag, ref issue #32.
-* Require Go 1.25 or later.
 * Refactor.
+
+## Changes from 1.0.11 to 1.0.12
+
+* Require Go 1.25 or later.
 * Update dependencies.
 
 ## Changes from 1.0.10 to 1.0.11
@@ -232,6 +235,6 @@ Pull requests are welcome.
 
 ## General information
 
-* Version: 1.0.12
+* Version: 1.0.13
 * Author: Alexander F. Rødseth &lt;xyproto@archlinux.org&gt;
 * License: BSD-3
