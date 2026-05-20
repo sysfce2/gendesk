@@ -402,19 +402,24 @@ func main() {
 		outputFilenames = strings.Split(outputFilename, ",")
 	}
 
-	// When --output is paired with a split-package PKGBUILD, require one
-	// filename per package; otherwise fall back to the single-package path
-	// and preserve the historical behavior of only generating pkgname[0].
+	// Normalize pkgnames for the single-package case (no PKGBUILD, or a
+	// PKGBUILD that didn't populate pkgnames for some reason).
+	if len(pkgnames) == 0 {
+		pkgnames = []string{pkgname}
+	}
+
+	// When --output names more than one file, or pairs a single name with a
+	// split-package PKGBUILD, require the counts to match exactly.
 	if len(outputFilenames) > 1 || (len(outputFilenames) == 1 && len(pkgnames) > 1) {
 		if len(outputFilenames) != len(pkgnames) {
 			o.ErrExit(fmt.Sprintf(
-				"--output lists %d filename(s) but PKGBUILD has %d package(s) (%s)",
+				"--output lists %d filename(s) but there are %d package(s) (%s)",
 				len(outputFilenames), len(pkgnames), strings.Join(pkgnames, ", ")))
 		}
 		// Keep the full pkgnames list so each package gets its own output
 	} else {
-		// Fill in the PkgInfo for the current pkgname using the given arguments.
-		// This overrides values from the PKGBUILD.
+		// Preserve the historical single-package behavior: only the current
+		// pkgname is generated, even if the PKGBUILD lists multiple packages.
 		pkgnames = []string{pkgname}
 	}
 
