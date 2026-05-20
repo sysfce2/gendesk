@@ -12,8 +12,10 @@ Pull requests are welcome.
 
 ## Changes from 1.0.11 to 1.0.12
 
-* Update dependencies.
+* Add an `-o`/`--output` flag, ref issue #32.
 * Require Go 1.25 or later.
+* Refactor.
+* Update dependencies.
 
 ## Changes from 1.0.10 to 1.0.11
 
