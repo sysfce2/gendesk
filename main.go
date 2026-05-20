@@ -58,7 +58,7 @@ func (c *DesktopConfig) desktopFilename() string {
 }
 
 const (
-	versionString = "Desktop File Generator 1.0.13"
+	versionString = "Desktop File Generator 1.0.14"
 
 	versionHelp       = "Show application name and version"
 	nodownloadHelp    = "Don't download anything"

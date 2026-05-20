@@ -10,6 +10,10 @@ Pull requests are welcome.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/gendesk.svg)](https://repology.org/project/gendesk/versions)
 
+## Changes from 1.0.13 to 1.0.14
+
+* Make `-o`/`--output` able to take a comma separated list of package names.
+
 ## Changes from 1.0.12 to 1.0.13
 
 * Add an `-o`/`--output` flag, ref issue #32.
@@ -235,6 +239,6 @@ Pull requests are welcome.
 
 ## General information
 
-* Version: 1.0.13
+* Version: 1.0.14
 * Author: Alexander F. Rødseth &lt;xyproto@archlinux.org&gt;
 * License: BSD-3
