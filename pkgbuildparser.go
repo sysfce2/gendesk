@@ -8,6 +8,29 @@ import (
 	"github.com/xyproto/vt"
 )
 
+// PkgInfo holds the per-pkgname fields collected from a PKGBUILD,
+// environment variables and command-line flags.
+type PkgInfo struct {
+	Pkgdesc     string
+	Exec        string
+	Name        string
+	GenericName string
+	MimeTypes   string
+	Comment     string
+	Categories  string
+	Custom      string
+}
+
+// ensurePkgInfo returns the PkgInfo for the given pkgname, creating it if missing
+func ensurePkgInfo(m map[string]*PkgInfo, pkgname string) *PkgInfo {
+	info, ok := m[pkgname]
+	if !ok {
+		info = &PkgInfo{}
+		m[pkgname] = info
+	}
+	return info
+}
+
 // Return a list of pkgnames for split packages
 // or just a list with the pkgname for regular packages
 func pkgList(splitpkgname string) []string {
@@ -58,8 +81,8 @@ func resolve(vars map[string]string, s *string) {
 	}
 }
 
-func parsePKGBUILD(o *vt.TextOutput, filename string, iconurl, pkgname *string, pkgnames *[]string, pkgdescMap, execMap, nameMap, genericNameMap, mimeTypesMap, commentMap, categoriesMap, customMap *map[string]string) {
-	// Fill in the dictionaries using a PKGBUILD
+func parsePKGBUILD(o *vt.TextOutput, filename string, iconurl, pkgname *string, pkgnames *[]string, pkgInfoMap map[string]*PkgInfo) {
+	// Fill in the per-pkgname PkgInfo structs using a PKGBUILD
 	filedata, err := os.ReadFile(filename)
 	if err != nil {
 		o.ErrExit("Could not read " + filename)
@@ -85,22 +108,21 @@ func parsePKGBUILD(o *vt.TextOutput, filename string, iconurl, pkgname *string, 
 			// Use the last found pkgname as the key
 			s := betweenQuotesOrAfterEquals(line)
 			resolve(vars, &s)
-			(*pkgdescMap)[*pkgname] = s
+			ensurePkgInfo(pkgInfoMap, *pkgname).Pkgdesc = s
 			vars["pkgdesc"] = s
 		case strings.HasPrefix(line, "_exec") && *pkgname != "":
 			// Custom executable for the .desktop file per (split) package
 			// Use the last found pkgname as the key
 			s := betweenQuotesOrAfterEquals(line)
 			resolve(vars, &s)
-
-			(*execMap)[*pkgname] = s
+			ensurePkgInfo(pkgInfoMap, *pkgname).Exec = s
 			vars["_exec"] = s
 		case strings.HasPrefix(line, "_name") && *pkgname != "":
 			// Custom Name for the .desktop file per (split) package
 			// Use the last found pkgname as the key
 			s := betweenQuotesOrAfterEquals(line)
 			resolve(vars, &s)
-			(*nameMap)[*pkgname] = s
+			ensurePkgInfo(pkgInfoMap, *pkgname).Name = s
 			vars["_name"] = s
 		case strings.HasPrefix(line, "_genericname") && *pkgname != "":
 			// Custom GenericName for the .desktop file per (split) package
@@ -108,7 +130,7 @@ func parsePKGBUILD(o *vt.TextOutput, filename string, iconurl, pkgname *string, 
 			// Use the last found pkgname as the key
 			if genericName != "" {
 				resolve(vars, &genericName)
-				(*genericNameMap)[*pkgname] = genericName
+				ensurePkgInfo(pkgInfoMap, *pkgname).GenericName = genericName
 				vars["_genericname"] = genericName
 			}
 		case strings.HasPrefix(line, "_mimetype") && *pkgname != "":
@@ -116,14 +138,14 @@ func parsePKGBUILD(o *vt.TextOutput, filename string, iconurl, pkgname *string, 
 			// Use the last found pkgname as the key
 			s := betweenQuotesOrAfterEquals(line)
 			resolve(vars, &s)
-			(*mimeTypesMap)[*pkgname] = s
+			ensurePkgInfo(pkgInfoMap, *pkgname).MimeTypes = s
 			vars["_mimetype"] = s
 		case strings.HasPrefix(line, "_comment") && *pkgname != "":
 			// Custom Comment for the .desktop file per (split) package
 			// Use the last found pkgname as the key
 			s := betweenQuotesOrAfterEquals(line)
 			resolve(vars, &s)
-			(*commentMap)[*pkgname] = s
+			ensurePkgInfo(pkgInfoMap, *pkgname).Comment = s
 			vars["_comment"] = s
 		case strings.HasPrefix(line, "_custom") && *pkgname != "":
 			// Custom string to be added to the end
@@ -131,13 +153,13 @@ func parsePKGBUILD(o *vt.TextOutput, filename string, iconurl, pkgname *string, 
 			// Use the last found pkgname as the key
 			s := betweenQuotesOrAfterEquals(line)
 			resolve(vars, &s)
-			(*customMap)[*pkgname] = s
+			ensurePkgInfo(pkgInfoMap, *pkgname).Custom = s
 			vars["_custom"] = s
 		case strings.HasPrefix(line, "_categories") && *pkgname != "":
 			// Use the last found pkgname as the key
 			s := betweenQuotesOrAfterEquals(line)
 			resolve(vars, &s)
-			(*categoriesMap)[*pkgname] = s
+			ensurePkgInfo(pkgInfoMap, *pkgname).Categories = s
 			vars["_categories"] = s
 		case ((strings.Contains(line, "http://") || strings.Contains(line, "https://")) && (strings.Contains(line, ".png") || strings.Contains(line, ".svg"))) && *iconurl == "":
 			// Only supports detecting png icon filenames when represented as just the filename or an URL starting with http/https.

@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/unknwon/goconfig"
+	"github.com/xyproto/files"
 	"github.com/xyproto/vt"
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
@@ -43,7 +44,7 @@ func MustDownloadFile(url, filename string, o *vt.TextOutput, force bool) {
 	}
 
 	// Check if the file exists (and that force is not enabled)
-	if exists(filename) && !force {
+	if files.Exists(filename) && !force {
 		o.ErrExit("no! " + filename + " already exists. Use -f to overwrite.")
 	}
 
@@ -190,7 +191,7 @@ func WriteIconFile(name string, o *vt.TextOutput, force bool) error {
 	}
 
 	// Check if the file exists (and that force is not enabled)
-	if exists(filename) && !force {
+	if files.Exists(filename) && !force {
 		o.ErrExit(filename + " already exists, use -f to overwrite")
 	}
 
