@@ -3,12 +3,18 @@
 # github.com/unknwon/goconfig v1.0.0
 ## explicit
 github.com/unknwon/goconfig
+# github.com/xyproto/binary v1.4.0
+## explicit; go 1.18
+github.com/xyproto/binary
 # github.com/xyproto/burnfont v1.2.3
 ## explicit; go 1.9
 github.com/xyproto/burnfont
 # github.com/xyproto/env/v2 v2.5.6
 ## explicit; go 1.19
 github.com/xyproto/env/v2
+# github.com/xyproto/files v1.10.8
+## explicit; go 1.19
+github.com/xyproto/files
 # github.com/xyproto/vt v1.9.11
 ## explicit; go 1.25.1
 github.com/xyproto/vt
