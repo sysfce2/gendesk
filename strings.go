@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"strings"
 )
 
@@ -80,19 +79,4 @@ func has(s, kw string) bool {
 		}
 	}
 	return false
-}
-
-func hasS(xs []string, x string) bool {
-	for _, e := range xs {
-		if e == x {
-			return true
-		}
-	}
-	return false
-}
-
-// exists checks if the given filename exists, using os.Stat
-func exists(filename string) bool {
-	_, err := os.Stat(filename)
-	return !os.IsNotExist(err)
 }

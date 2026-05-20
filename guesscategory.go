@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"slices"
 	"strings"
 )
 
@@ -118,13 +119,13 @@ func ValidCategoryWords(categoryWords []string) error {
 			if strings.TrimSpace(field) == "" {
 				continue
 			}
-			if !hasS(validWords, field) {
+			if !slices.Contains(validWords, field) {
 				validWords = append(validWords, field)
 			}
 		}
 	}
 	for _, word := range categoryWords {
-		if !hasS(validWords, word) && !hasS(additionalCategories, word) {
+		if !slices.Contains(validWords, word) && !slices.Contains(additionalCategories, word) {
 			return errors.New(word + " is an unrecognized category")
 		}
 	}
