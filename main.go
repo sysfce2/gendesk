@@ -79,7 +79,7 @@ const (
 	startupnotifyHelp = "Notification when the application starts (default is false)"
 	customHelp        = "Custom line to append at the end of the .desktop file"
 	iconHelp          = "Specify a filename that will be used for the icon"
-	outputHelp        = "Output .desktop filename (defaults to PKGNAME.desktop)"
+	outputHelp        = "Output .desktop filename, or comma-separated list (one per pkgname) for split PKGBUILDs (defaults to PKGNAME.desktop)"
 
 	defaultPKGBUILD = "../PKGBUILD"
 )
@@ -198,6 +198,14 @@ func writeDesktopFile(cfg *DesktopConfig, o *vt.TextOutput) {
 	os.WriteFile(filename, buf.Bytes(), 0644)
 }
 
+// progress prints a "[pkgname]<padding>message... " progress line through o,
+// honoring both --quiet (via o) and --nocolor (via tag substitution)
+func progress(o *vt.TextOutput, pkgname, message string) {
+	const nSpaces = 32
+	spaces := strings.Repeat(" ", nSpaces)[:nSpaces-min(nSpaces, len(pkgname))]
+	o.Printf("<darkgray>[</darkgray><lightblue>%s</lightblue><darkgray>]</darkgray>%s<darkgray>%s</darkgray> ", pkgname, spaces, message)
+}
+
 // keywordsInDescription checks if the given package description contains one of the given keywords
 func keywordsInDescription(pkgdesc string, keywords []string) bool {
 	for _, keyword := range keywords {
@@ -314,10 +322,20 @@ func main() {
 		pkgInfoMap = make(map[string]*PkgInfo)
 	)
 
+	// Parse flags, but allow them to appear after positional arguments too
+	// (Go's flag package stops at the first non-flag by default).
 	flag.Parse()
+	var args []string
+	for {
+		remaining := flag.Args()
+		if len(remaining) == 0 {
+			break
+		}
+		args = append(args, remaining[0])
+		flag.CommandLine.Parse(remaining[1:])
+	}
 
 	var (
-		args    = flag.Args()
 		pkgname = *givenPkgname
 		pkgdesc = *givenPkgdesc
 
@@ -372,9 +390,33 @@ func main() {
 		}
 	}
 
-	// Fill in the PkgInfo for the current pkgname using the given arguments.
-	// This overrides values from the PKGBUILD.
-	pkgnames = []string{pkgname}
+	// Either --output or -o may be given, prefer --output if both are set.
+	// A comma-separated list is allowed to pair one filename per package
+	// in a split PKGBUILD.
+	outputFilename := *output
+	if outputFilename == "" {
+		outputFilename = *o2
+	}
+	var outputFilenames []string
+	if outputFilename != "" {
+		outputFilenames = strings.Split(outputFilename, ",")
+	}
+
+	// When --output is paired with a split-package PKGBUILD, require one
+	// filename per package; otherwise fall back to the single-package path
+	// and preserve the historical behavior of only generating pkgname[0].
+	if len(outputFilenames) > 1 || (len(outputFilenames) == 1 && len(pkgnames) > 1) {
+		if len(outputFilenames) != len(pkgnames) {
+			o.ErrExit(fmt.Sprintf(
+				"--output lists %d filename(s) but PKGBUILD has %d package(s) (%s)",
+				len(outputFilenames), len(pkgnames), strings.Join(pkgnames, ", ")))
+		}
+		// Keep the full pkgnames list so each package gets its own output
+	} else {
+		// Fill in the PkgInfo for the current pkgname using the given arguments.
+		// This overrides values from the PKGBUILD.
+		pkgnames = []string{pkgname}
+	}
 
 	// Set a PkgInfo field if the given value is not an empty string
 	setv := func(field *string, value string) {
@@ -396,14 +438,8 @@ func main() {
 	setv(&info.Categories, *categories)
 	setv(&info.Custom, *custom)
 
-	// Either --output or -o may be given, prefer --output if both are set
-	outputFilename := *output
-	if outputFilename == "" {
-		outputFilename = *o2
-	}
-
 	// Write .desktop and .png icon for each package
-	for _, pkgname := range pkgnames {
+	for i, pkgname := range pkgnames {
 		if strings.Contains(pkgname, "-nox") || strings.Contains(pkgname, "-cli") {
 			// Don't bother if it's a -nox or -cli package
 			continue
@@ -444,6 +480,14 @@ func main() {
 			execCommand += " %u"
 		}
 
+		// Pick the per-package output filename: index into the comma-split
+		// list when one was given, otherwise the single value (or "" for the
+		// default PKGNAME.desktop fallback).
+		perPkgOutput := ""
+		if i < len(outputFilenames) {
+			perPkgOutput = outputFilenames[i]
+		}
+
 		cfg := &DesktopConfig{
 			Pkgname:       pkgname,
 			Name:          name,
@@ -455,21 +499,13 @@ func main() {
 			GenericName:   info.GenericName,
 			MimeTypes:     info.MimeTypes,
 			Custom:        info.Custom,
-			Output:        outputFilename,
+			Output:        perPkgOutput,
 			UseTerminal:   *terminal,
 			StartupNotify: *startupnotify,
 			Force:         *force,
 		}
 
-		// TODO: Refactor into a function
-		const nSpaces = 32
-		spaces := strings.Repeat(" ", nSpaces)[:nSpaces-min(nSpaces, len(pkgname))]
-		if o.Enabled() {
-			fmt.Printf("%s%s%s%s%s ",
-				vt.DarkGray.Get("["), vt.LightBlue.Get(pkgname),
-				vt.DarkGray.Get("]"), spaces,
-				vt.DarkGray.Get("Generating desktop file..."))
-		}
+		progress(o, pkgname, "Generating desktop file...")
 
 		if *windowmanager {
 			writeWindowManagerDesktopFile(cfg, o)
@@ -477,9 +513,7 @@ func main() {
 			writeDesktopFile(cfg, o)
 		}
 
-		if o.Enabled() {
-			fmt.Printf("%s\n", vt.Green.Get("ok"))
-		}
+		o.Printf("<green>ok</green>\n")
 
 		// TODO: Refactor into a function
 		// Download an icon if it's not downloaded by
@@ -491,10 +525,7 @@ func main() {
 			if len(pkgname) < 1 {
 				o.Err("No pkgname, can't download icon")
 			}
-			fmt.Printf("%s%s%s%s%s ",
-				vt.DarkGray.Get("["), vt.LightBlue.Get(pkgname),
-				vt.DarkGray.Get("]"), spaces,
-				vt.DarkGray.Get("Downloading icon..."))
+			progress(o, pkgname, "Downloading icon...")
 			var err error
 			if manualIconurl == "" {
 				err = WriteIconFile(pkgname, o, *force)
@@ -509,21 +540,12 @@ func main() {
 				MustDownloadFile(manualIconurl, iconFilename, o, *force)
 			}
 			if err == nil {
-				if o.Enabled() {
-					fmt.Printf("%s\n", vt.LightCyan.Get("ok"))
-				}
+				o.Printf("<lightcyan>ok</lightcyan>\n")
 			} else {
-				if o.Enabled() {
-					fmt.Printf("%s\n", vt.Yellow.Get("no"))
-					fmt.Printf("%s%s%s%s%s ",
-						vt.DarkGray.Get("["),
-						vt.LightBlue.Get(pkgname),
-						vt.DarkGray.Get("]"),
-						spaces,
-						vt.DarkGray.Get("Using default icon instead..."))
-				}
-				if err := WriteDefaultIconFile(pkgname, o); (err == nil) && o.Enabled() {
-					fmt.Printf("%s\n", vt.LightMagenta.Get("yes"))
+				o.Printf("<yellow>no</yellow>\n")
+				progress(o, pkgname, "Using default icon instead...")
+				if err := WriteDefaultIconFile(pkgname, o); err == nil {
+					o.Printf("<lightmagenta>yes</lightmagenta>\n")
 				}
 			}
 		}
