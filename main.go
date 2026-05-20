@@ -29,7 +29,7 @@ type AppStarter struct {
 }
 
 const (
-	versionString = "Desktop File Generator 1.0.11"
+	versionString = "Desktop File Generator 1.0.12"
 
 	versionHelp       = "Show application name and version"
 	nodownloadHelp    = "Don't download anything"
