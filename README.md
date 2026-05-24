@@ -231,7 +231,7 @@ Pull requests are welcome.
 
 ## Requirements
 
-* Go 1.17 or later.
+* Go 1.25 or later.
 
 ## Troubleshooting
 
