@@ -399,7 +399,9 @@ func main() {
 	}
 	var outputFilenames []string
 	if outputFilename != "" {
-		outputFilenames = strings.Split(outputFilename, ",")
+		for _, s := range strings.Split(outputFilename, ",") {
+			outputFilenames = append(outputFilenames, strings.TrimSpace(s))
+		}
 	}
 
 	// Normalize pkgnames for the single-package case (no PKGBUILD, or a
