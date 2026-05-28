@@ -422,6 +422,9 @@ func main() {
 	} else {
 		// Preserve the historical single-package behavior: only the current
 		// pkgname is generated, even if the PKGBUILD lists multiple packages.
+		if len(pkgnames) > 1 && len(outputFilenames) == 1 {
+			o.Eprintf("warning: --output specifies 1 filename but there are %d packages, only generating for %s\n", len(pkgnames), pkgname)
+		}
 		pkgnames = []string{pkgname}
 	}
 
