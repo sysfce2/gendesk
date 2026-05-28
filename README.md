@@ -13,6 +13,8 @@ Pull requests are welcome.
 ## Changes from 1.0.13 to 1.0.14
 
 * Make `-o`/`--output` able to take a comma separated list of package names.
+* Trim leading and trailing whitespace if multiple output files are specified.
+* Add more tests.
 
 ## Changes from 1.0.12 to 1.0.13
 
