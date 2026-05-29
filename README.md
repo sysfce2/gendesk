@@ -10,11 +10,15 @@ Pull requests are welcome.
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/gendesk.svg)](https://repology.org/project/gendesk/versions)
 
+## Changes from 1.0.14 to 1.0.15
+
+* Trim leading and trailing spaces if several output filenames are given.
+* Warn when outputting a single file when `-o` is used for a split package.
+* Add more tests.
+
 ## Changes from 1.0.13 to 1.0.14
 
 * Make `-o`/`--output` able to take a comma separated list of package names.
-* Trim leading and trailing whitespace if multiple output files are specified.
-* Add more tests.
 
 ## Changes from 1.0.12 to 1.0.13
 
@@ -241,6 +245,6 @@ Pull requests are welcome.
 
 ## General information
 
-* Version: 1.0.14
+* Version: 1.0.15
 * Author: Alexander F. Rødseth &lt;xyproto@archlinux.org&gt;
 * License: BSD-3
